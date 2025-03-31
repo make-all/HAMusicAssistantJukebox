@@ -4,8 +4,7 @@ A web-based song request system that integrates with Home Assistant and Music As
 
 ![alt text](https://github.com/DanStennett/HAMusicAssistantJukebox/blob/main/readme_image.jpg?raw=true)
 
-
-https://github.com/user-attachments/assets/b11859fe-2e41-4d45-98f9-5967470b3457
+https://github.com/user-attachments/assets/bea6223d-663b-40de-b3ec-5f62a9460696
 
 
 ## Features
