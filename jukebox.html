@@ -605,7 +605,7 @@
                 const playRequest = {
                     enqueue: queueMode,
                     media_id: track.uri,
-                    entity_id: "media_player.office_speaker"
+                    entity_id: MEDIA_PLAYER
                 };
 
                 const response = await fetch(PLAY_API_ENDPOINT, {
