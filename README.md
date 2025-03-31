@@ -111,19 +111,15 @@ const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA conf
 
 - Toggle `input_boolean.songrequestaccess` to enable/disable the interface.
 
-## Tips:
-Create a QR Code of your URL to share with guests so they can easily access it
-
 ## Additional enhancements:
-I stream my music to a couple of android tv's around the house with MA.
+I stream my music to a couple of android tv's using Chomecast around the house with MA.
 
-Using PiPup on an android tv, you can display the QR code as a PiP pop up over your MA music and trigger 
+Using PiPup on an android tv, you can display the QR code as a Picture-In-Picture pop up over your MA music player and trigger 
 it to appear using the songrequestaccess switch helper created earlier so guests can easily Scan the QR
 Code from your TV(s) when the request systems is active.
 
 Guide to set up PiPUp on android tv's is here:
 https://community.home-assistant.io/t/a-short-guide-for-setting-up-tv-pip-notifications-with-pipup/537084
-
 
 ## Security Considerations
 
