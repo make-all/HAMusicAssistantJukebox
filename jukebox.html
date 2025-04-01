@@ -8,11 +8,12 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Song Search</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://kit.fontawesome.com/e54d0c3ef1.js" crossorigin="anonymous"></script>
     <script>
         // Configuration - Replace with your actual API endpoints and tokens
         const HAURL = 'http://<your HA IP here>.:8123'; // Your internal HA URL IP
-        const API_TOKEN = 'your_long_lived_access_token'; // Your HA token
+        const API_TOKEN = null // Will be set after loading
         const QUEUEWEBHOOK = 'your-webhook-id'; // required to coordinate Jukebox Queue mode.
         const MEDIA_PLAYER = "media_player.your_speaker"; // Your speaker entity to play the tuuuuuuunes
         const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA config ID
@@ -366,6 +367,32 @@
     </div>
 
     <script>
+        async function getApiToken() {
+            try {
+                // Add timestamp to URL to prevent caching
+                const timestamp = new Date().getTime();
+                const response = await fetch(`jukeboxtoken.key?_=${timestamp}`, {
+                    // Add cache control headers
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load API token');
+                }
+                const token = await response.text();
+                return token.trim(); // Remove any whitespace
+            } catch (error) {
+                console.error('Error loading API token:', error);
+                //alert('Failed to load authentication token. Please check if jukeboxtoken.key exists.');
+                return null;
+            }
+        }
+
 
         // API Endpoints
         const CHECK_API_ENDPOINT = HAURL+'/api/states/input_boolean.songrequestaccess';
@@ -383,6 +410,18 @@
         // Initialize the app
         document.addEventListener('DOMContentLoaded', async () => {
             
+            API_TOKEN = await getApiToken();
+
+            if (!API_TOKEN) {
+                document.getElementById('page').style.display = 'none';
+                document.getElementById('accessDenied').style.display = 'block';
+                document.getElementById('accessDenied').innerHTML = `
+                    <h2>Queueing Closed</h2>
+                    <p>Sorry, the jukebox is currently disabled. Until next time!</p>
+                `;
+                return;
+            }
+
             //const AppEnabled = await checkService();
             startServiceCheck();
 
@@ -668,10 +707,83 @@
             }
         }
         
+        function startServiceCheck() {
+            let checkInterval;
+
+            // First verify token before starting checks
+            const verifyAndStartChecks = async () => {
+                
+                const token = await getApiToken();
+                if (!token) {
+                    console.error('No valid API token found');
+                    document.getElementById('page').style.display = 'none';
+                    document.getElementById('accessDenied').style.display = 'block';
+                    document.getElementById('accessDenied').innerHTML = `
+                        <h2>Authentication Error</h2>
+                        <p>No valid API token found. Please check your configuration.</p>
+                    `;
+                    return;
+                }
+
+                
+                checkService().catch(error => {
+                    if (error.status === 401) {
+                        console.error('Authentication failed, stopping service checks');
+                        if (checkInterval) {
+                            clearInterval(checkInterval);
+                        }
+                        document.getElementById('page').style.display = 'none';
+                        document.getElementById('accessDenied').style.display = 'block';
+                        document.getElementById('accessDenied').innerHTML = `
+                            <h2>Authentication Error</h2>
+                            <p>Failed to authenticate with Home Assistant. Please check your token.</p>
+                        `;
+                    }
+                });
+                
+                // Then check every 10 seconds
+                checkInterval = setInterval(async () => {
+                    try {
+                        // Verify token before each check
+                        const currentToken = await getApiToken();
+                        if (!currentToken) {
+                            throw { status: 401, message: 'No valid API token' };
+                        }
+                        
+                        const isEnabled = await checkService();
+                        const pageElement = document.getElementById('page');
+                        const accessDeniedElement = document.getElementById('accessDenied');
+
+                        if (!isEnabled) {
+                            pageElement.style.display = 'none';
+                            accessDeniedElement.style.display = 'block';
+                            document.getElementById('songResults').innerHTML = '';
+                            document.getElementById('searchInput').value = '';
+                        } else {
+                            pageElement.style.display = 'block';
+                            accessDeniedElement.style.display = 'none';
+                        }
+                    } catch (error) {
+                        if (error.status === 401) {
+                            console.error('Authentication failed, stopping service checks');
+                            clearInterval(checkInterval);
+                            document.getElementById('page').style.display = 'none';
+                            document.getElementById('accessDenied').style.display = 'block';
+                            document.getElementById('accessDenied').innerHTML = `
+                                <h2>Authentication Error</h2>
+                                <p>Failed to authenticate with Home Assistant. Please check your token.</p>
+                            `;
+                        }
+                    }
+                }, 10000);
+            };
+
+            // Start the verification and check process
+            verifyAndStartChecks();
+        }
+
         async function checkService() {
             try {
-
-
                 const response = await fetch(CHECK_API_ENDPOINT, {
                     method: 'GET',
                     credentials: "same-origin",
@@ -681,6 +793,12 @@
                         'Accept': 'application/json'
                     }
                 });
+
+                if (response.status === 401) {
+                    const error = new Error('Unauthorized');
+                    error.status = 401;
+                    throw error;
+                }
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -695,11 +813,6 @@
                     console.log("app enabled");
                     pageElement.style.display = 'block';
                     accessDeniedElement.style.display = 'none';
-                     // Show placeholder when page becomes visible
-                    const placeholder = document.getElementById('placeholderImage');
-                    if (placeholder) {
-                        //placeholder.style.display = 'block';
-                    }
                     return true;
                 } else {
                     console.log("app disabled");
@@ -710,33 +823,8 @@
 
             } catch (error) {
                 console.error('Error checking service:', error);
-                document.getElementById('page').style.display = 'none';
-                document.getElementById('accessDenied').style.display = 'block';
-                return false;
+                throw error; // Re-throw to handle in startServiceCheck
             }
-        }
-
-        function startServiceCheck() {
-            // Check immediately on start
-            checkService();
-            
-            // Then check every 10 seconds
-            setInterval(async () => {
-                const isEnabled = await checkService();
-                const pageElement = document.getElementById('page');
-                const accessDeniedElement = document.getElementById('accessDenied');
-    
-                if (!isEnabled) {
-                    pageElement.style.display = 'none';
-                    accessDeniedElement.style.display = 'block';
-                    // Clear any existing search results when access is denied
-                    document.getElementById('songResults').innerHTML = '';
-                    document.getElementById('searchInput').value = '';
-                } else {
-                    pageElement.style.display = 'block';
-                    accessDeniedElement.style.display = 'none';
-                }
-            }, 10000); // 10000 milliseconds = 10 seconds
         }
     
         var TxtRotate = function(el, toRotate, period) {
@@ -790,8 +878,8 @@
             // Create QR code
             new QRCode(qrContainer, {
                 text: window.location.href,
-                width: 128,
-                height: 128,
+                width: 200,
+                height: 200,
                 colorDark: "#ffffff",
                 colorLight: "#00000000", // Transparent background
                 correctLevel: QRCode.CorrectLevel.H
