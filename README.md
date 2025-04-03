@@ -120,8 +120,8 @@ const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA conf
 7. **Publish the HTML**
    - Place the configured HTML file to your config\www folder in Home Assistant along with the bg.jpg
 
-   - Test the url by switching on the input_boolean.songrequestaccess input boolean toggle and visiting the path in your browser.
-      It should be something like http://192.168.1.34:8123/local/jukebox.html and the interface should appear.
+   - If you've done everything right, test the url by switching on the input_boolean.songrequestaccess input boolean toggle and visiting the page in your browser.
+     It should be something like http://homeassistant.local:8123/local/jukebox.html and the interface should appear.
 
 ## Usage Control
 
