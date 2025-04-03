@@ -8,12 +8,11 @@ https://github.com/user-attachments/assets/bea6223d-663b-40de-b3ec-5f62a9460696
 
 
 ## Features
-
 - Real-time song search across all connected providers
-- No login, just pass out the url to guests and enjoy!
+- Minimalist responsive design with album artwork display
+- No login, just share the URL/QR to guests and enjoy!
 - Queue songs with your guests
 - Auto queues a nominated default party playlist when jukebox requests are all played to keep the party going
-- Minimalist responsive design with album artwork display
 - Access control through Home Assistant
 - Auto revoking/creating access keys when enabling/disabling the service
 
