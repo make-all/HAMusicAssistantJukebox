@@ -45,8 +45,8 @@ https://github.com/user-attachments/assets/bea6223d-663b-40de-b3ec-5f62a9460696
 
 4. **Webhook ID** (`QUEUEWEBHOOK`):
    - Required to let home assistant know which queuing type to choose
-   - Create an automation with webhook trigger
-   - Save the automation (will set this up later)
+   - Create an automation with webhook trigger (See step 3 of Config & Setup)
+   - Save the automation
    - Copy the webhook ID from the trigger
 
 ## 2. Configuration and Setup
