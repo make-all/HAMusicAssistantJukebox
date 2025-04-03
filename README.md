@@ -111,10 +111,10 @@ input_number:
 Update the configuration section in `jukebox.html`:
 
 ```javascript
-const HAURL = 'http://<your HA IP here>:8123'; // Your internal HA URL IP
-const QUEUEWEBHOOK = 'your-webhook-id'; // required to coordinate Jukebox Queue mode.
-const MEDIA_PLAYER = "media_player.your_speaker"; // Your speaker entity to play the tuuuuuuunes
-const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA config ID
+const HAURL = 'http://[YOUR HA ADDRESS]:8123'; // Your internal HA URL
+const QUEUEWEBHOOK = "[YOUR_WEBHOOK_ID]"; // required to coordinate Jukebox Queue mode.
+const MEDIA_PLAYER = "[media_player.YOUR_SPEAKER]"; // Your speaker entity to play the tuuuuuuunes
+const MUSIC_ASSISTANT_CONFIG = "[YOUR_MUSIC_ASSISTANT_CONFIG_ID]"; // Your MA config ID
 ```
 
 7. **Publish the HTML**
