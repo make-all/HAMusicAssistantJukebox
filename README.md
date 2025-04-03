@@ -60,7 +60,7 @@ input_boolean:
     initial: off
   jukebox_queue:
     name: Jukebox Queue Mode
-    initial: on
+    initial: off
 input_number:
   jukebox_queue_length:
     name: Jukebox Queue Length
