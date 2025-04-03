@@ -28,22 +28,22 @@ https://github.com/user-attachments/assets/bea6223d-663b-40de-b3ec-5f62a9460696
 
 ### 1. Getting Required Values
 
-1. **Home Assistant URL** (`HAURL`):
+ **Home Assistant URL** (`HAURL`):
    - Your Home Assistant instance URL (highly advise limiting this to your internal network only)
    - Example: `http://homeassistant.local:8123`
 
-2. **Music Assistant Config ID** (`MUSIC_ASSISTANT_CONFIG`):
+ **Music Assistant Config ID** (`MUSIC_ASSISTANT_CONFIG`):
    - In Home Assistant, go to Developer Tools > Services
    - Find `music_assistant.search`
    - Look for `config_entry_id` in the service data
    - Copy the ID value
 
-3. **Media Player Entity** (`MEDIA_PLAYER`):
+ **Media Player Entity** (`MEDIA_PLAYER`):
    - In Home Assistant, go to Developer Tools > States
    - Find your speaker's entity ID
    - Example: `media_player.party_speaker`
 
-4. **Webhook ID** (`QUEUEWEBHOOK`):
+ **Webhook ID** (`QUEUEWEBHOOK`):
    - Required to let home assistant know which queuing type to choose
    - Create an automation with webhook trigger (See step 3 of Config & Setup)
    - Save the automation
