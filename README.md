@@ -116,7 +116,21 @@ const MEDIA_PLAYER = "[media_player.YOUR_SPEAKER]"; // Your speaker entity to pl
 const MUSIC_ASSISTANT_CONFIG = "[YOUR_MUSIC_ASSISTANT_CONFIG_ID]"; // Your MA config ID
 ```
 
-7. **Publish the HTML**
+7. Update your Configuration yaml with the following:
+```yaml
+http:
+  cors_allowed_origins:
+    - "http://localhost:5500"
+    - "http://127.0.0.1:5500"
+    - "null"
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+```
+then **save** and restart HA.
+
+9. **Publish the HTML**
    - Place the configured HTML file to your config\www folder in Home Assistant along with the bg.jpg
 
    - If you've done everything right, test the url by switching on the input_boolean.songrequestaccess input boolean toggle and visiting the page in your browser.
