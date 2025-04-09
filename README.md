@@ -165,3 +165,6 @@ If you encounter issues:
 - Home Assistant: [Community Forums](https://community.home-assistant.io/)
 - Music Assistant: [Documentation](https://music-assistant.github.io/)
 - Issues with this app: Open an issue on the repository
+
+## Buy me a Coffee :)
+[![PayPal Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?business=XEYGDHYHSMANJ&no_recurring=0&currency_code=AUD)
