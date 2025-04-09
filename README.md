@@ -69,7 +69,7 @@ input_number:
 1. **Set up API Token Management** 
    - Go to your Home Assistant Admin profile
    - Scroll to bottom under Long Lived Access Tokens
-   - Click "Create Token" (this will be your management token and only used internally)
+   - Click "Create Token" (this will be your management token and only used internally), name it JukeboxManagement.
    - Copy the generated token and paste it into the manage_tokens.py script in the parameter at the top of the script
    - Enter your HA local IP at the top of the script
    - Save the file
