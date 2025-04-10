@@ -32,9 +32,11 @@ https://github.com/user-attachments/assets/bea6223d-663b-40de-b3ec-5f62a9460696
    - Example: `http://homeassistant.local:8123`
 
  **Music Assistant Config ID** (`MUSIC_ASSISTANT_CONFIG`):
-   - In Home Assistant, go to Developer Tools > Services
+   - In Home Assistant, go to Developer Tools > Actions
    - Find `music_assistant.search`
-   - Look for `config_entry_id` in the service data
+   - Select you Music Assistant Instance from the first dropdown.
+   - Click on "GO TO YAML MODE"
+   - Look for `config_entry_id` value in the service data
    - Copy the ID value
 
  **Media Player Entity** (`MEDIA_PLAYER`):
