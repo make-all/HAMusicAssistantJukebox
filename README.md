@@ -92,7 +92,7 @@ input_number:
 
 3. **Set up the Notify of Queued Song Automation**
    - Create a new home assistant automation using the Jukebox - Notify of Queued Song.yaml code
-   - Replace the <YOUR WEBHOOK ID HERE> code with your own generated from the webhook trigger of the automation. (refer to the [HA documentation](https://www.home-assistant.io/docs/automation/trigger/#webhook-trigger) on how to set up webhooks)
+   - Replace the <YOUR WEBHOOK ID HERE> code with your own generated from the webhook trigger of the automation. (refer to the [HA documentation](https://www.home-assistant.io/docs/automation/trigger/#webhook-trigger) on how to set up webhooks) (example: [webhooks youtube vid](https://www.youtube.com/watch?v=2RP236gAPsM))
    - Save the automation
      
 4. **Set up the set Default playlist when queue reaches zero Automation**
