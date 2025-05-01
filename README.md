@@ -79,8 +79,8 @@ input_number:
    - open your Configuration.yaml and add these entries to your file:
      ```yaml
      shell_command:
-        create_jukebox_token: python3 /config/python_scripts/manage_tokens.py 
-        delete_jukebox_token: python3 /config/python_scripts/manage_tokens.py delete //revokes they key and deletes the key file from config/www
+        create_jukebox_token: python3 /config/python_scripts/manage_token.py 
+        delete_jukebox_token: python3 /config/python_scripts/manage_token.py delete //revokes they key and deletes the key file from config/www
      ```
      The create_jukebox_token function generates a new token and puts it in a .key file in the config/www directory for use by the app.
      The delete_jukebox_token function deletes the token, revoking access and deletes the key file from the config/www directory.
