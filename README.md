@@ -72,10 +72,10 @@ input_number:
    - Go to your Home Assistant Admin profile
    - Scroll to bottom under Long Lived Access Tokens
    - Click "Create Token" (this will be your management token and only used internally), name it JukeboxManagement.
-   - Copy the generated token and paste it into the manage_tokens.py script in the parameter at the top of the script
+   - Copy the generated token and paste it into the manage_token.py script in the parameter at the top of the script
    - Enter your HA local IP at the top of the script
    - Save the file
-   - Copy the saved manage_tokens.py file to Config/python_scripts/manage_tokens.py (you can use the Samba Share or File Editor addons to access the HA folder structure)
+   - Copy the saved manage_token.py file to Config/python_scripts/manage_token.py (you can use the Samba Share or File Editor addons to access the HA folder structure)
    - open your Configuration.yaml and add these entries to your file:
      ```yaml
      shell_command:
