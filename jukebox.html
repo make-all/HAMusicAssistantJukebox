@@ -48,6 +48,18 @@
         color:#ddd
     }
 
+    #page, #accessDenied {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    body.loaded #page,
+    body.loaded #accessDenied {
+        visibility: visible;
+        opacity: 1;
+    }
+
     #accessDenied {
         display: none;
         text-align: center;
@@ -189,6 +201,28 @@
         border-radius: 4px;
     }
     
+    .placeholder-art {
+        width: 250px;
+        max-width: 250px;
+        margin-left: 20px;
+        aspect-ratio: 1;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.1em;
+        text-align: center;
+    }
+
+    .placeholder-art i {
+        font-size: 3em;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
+
     #searchButton {
         border: 1px solid #373497;
         background-color: #246fe0;
@@ -265,6 +299,22 @@
 
         .album-cover {
             max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .placeholder-art {
+            width: 250px;
+            max-width: 250px;
+            aspect-ratio: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1em;
+            text-align: center;
             margin: 0 auto;
         }
 
@@ -419,8 +469,14 @@
                     <h2>Queueing Closed</h2>
                     <p>Sorry, the jukebox is currently disabled. Until next time!</p>
                 `;
-                return;
+            } else {
+                document.getElementById('page').style.display = 'block';
+                document.getElementById('accessDenied').style.display = 'none';
             }
+
+            // Add loaded class to body to trigger fade in
+            document.body.classList.add('loaded');
+    
 
             //const AppEnabled = await checkService();
             startServiceCheck();
@@ -578,11 +634,24 @@
                 
                 // Album cover cell
                 const coverCell = row.insertCell();
-                const coverImg = document.createElement('img');
-                coverImg.src = track.image || 'placeholder-image.jpg';
-                coverImg.alt = 'Album Cover';
-                coverImg.className = 'album-cover';
-                coverCell.appendChild(coverImg);
+                if (track.image) {
+                    const coverImg = document.createElement('img');
+                    coverImg.src = track.image;
+                    coverImg.alt = 'Album Cover';
+                    coverImg.className = 'album-cover';
+                    coverCell.appendChild(coverImg);
+                    
+                } else {
+                    const placeholderDiv = document.createElement('div');
+                    placeholderDiv.className = 'placeholder-art';
+                    const icon = document.createElement('i');
+                    icon.className = 'fa-solid fa-music';
+                    const artistDiv = document.createElement('div');
+                    artistDiv.textContent = track.artists.map(artist => artist.name).join(', ');
+                    placeholderDiv.appendChild(icon);
+                    placeholderDiv.appendChild(artistDiv);
+                    coverCell.appendChild(placeholderDiv);
+                }
 
                 // Combined track and artist cell
                 const detailsCell = row.insertCell();
@@ -719,8 +788,8 @@
                     document.getElementById('page').style.display = 'none';
                     document.getElementById('accessDenied').style.display = 'block';
                     document.getElementById('accessDenied').innerHTML = `
-                        <h2>Authentication Error</h2>
-                        <p>No valid API token found. Please check your configuration.</p>
+                        <h2>Queueing Closed</h2>
+                        <p>Sorry, the jukebox is currently disabled. Until next time!</p>
                     `;
                     return;
                 }
