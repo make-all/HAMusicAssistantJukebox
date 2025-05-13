@@ -19,10 +19,14 @@ actions:
       items_count: >-
         {% set matches = speaker_data | regex_findall("'items': (\d+)") %} {{
         matches[0] if matches else 0 }}
+        current_index: >-
+        {% set matches = speaker_data | regex_findall("'current_index': (\d+)")
+        %} {{ matches[0] if matches else 0 }}
+        remaining: "{{ (items_count | int) - (current_index | int) }}"
   - action: input_number.set_value
     target:
       entity_id: input_number.jukebox_queue_length
     data:
-      value: "{{ items_count | float }}"
+      value: "{{ remaining | float }}"
 mode: queued
 max: 10
