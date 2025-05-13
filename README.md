@@ -66,6 +66,8 @@ input_number:
   jukebox_queue_length:
     name: Jukebox Queue Length
     initial: 0
+    min: 0
+    max: 100
 ```
 
 1. **Set up API Token Management** 
