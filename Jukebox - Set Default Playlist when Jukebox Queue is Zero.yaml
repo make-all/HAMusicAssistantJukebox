@@ -16,7 +16,7 @@ actions:
     metadata: {}
     data:
       enqueue: play
-      media_id: <YOUR DEFAULT PARTY PLAYLIST HERE>
+      media_id: <YOUR DEFAULT PARTY PLAYLIST NAME HERE>
       media_type: playlist
     target:
       entity_id: media_player.<YOUR MEDIA PLAYER HERE>
