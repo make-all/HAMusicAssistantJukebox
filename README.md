@@ -52,7 +52,7 @@ https://github.com/user-attachments/assets/bea6223d-663b-40de-b3ec-5f62a9460696
 
 ## 2. Configuration and Setup
 
-Create these helpers in Home Assistant by adding this code to your configuration.yaml or creating them via in Settings > Devices and Services > Helpers :
+Create these helpers in Home Assistant by adding this code to your configuration.yaml or creating them via the UI in Home Assistant Settings > Devices and Services > Helpers :
 
 ```yaml
 input_boolean:
