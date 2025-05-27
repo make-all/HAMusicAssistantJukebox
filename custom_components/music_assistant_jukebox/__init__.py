@@ -126,15 +126,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             if blueprint_path.exists():
                 shutil.rmtree(blueprint_path)
                 LOGGER.info("Removed Blueprint files")
-
-
-                # First check for and remove any existing tokens with this name
-            refresh_tokens = await user.refresh_tokens.async_get_refresh_tokens_for_handler(None)
-            for refresh_token in refresh_tokens:
-                if refresh_token.client_name == "jukeboxmanagement":
-                    await self.hass.auth.async_remove_refresh_token(refresh_token)
+            refresh_tokens = self.hass.auth._store.async_get_refresh_tokens()
+            # Remove existing tokens for jukeboxmanagement
+            for token in refresh_tokens:
+                if token.client_name == "jukeboxmanagement":
+                    self.hass.auth._store.async_remove_refresh_token(token)
                     LOGGER.debug("Removed existing jukebox token")
-            
+
         except Exception as err:
             LOGGER.error("Error during cleanup: %s", err)
         
