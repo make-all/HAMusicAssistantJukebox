@@ -92,17 +92,17 @@ class JukeboxAccessSwitch(JukeboxBaseMixin, SwitchEntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on access and generate token."""
         try:
-            # Only create new token if we don't have one stored
             if not self._token:
                 user = await self.hass.auth.async_get_owner()
-
-                # First check for and remove any existing tokens with this name
-                refresh_tokens = await user.refresh_tokens.async_get_refresh_tokens_for_handler(None)
-                for refresh_token in refresh_tokens:
-                    if refresh_token.client_name == "jukeboxmanagement":
-                        await self.hass.auth.async_remove_refresh_token(refresh_token)
+                
+                # Get all refresh tokens through the auth store
+                refresh_tokens = await self.hass.auth._store.async_get_refresh_tokens()
+                # Remove existing tokens for jukeboxmanagement
+                for token in refresh_tokens:
+                    if token.client_name == "jukeboxmanagement":
+                        await self.hass.auth._store.async_delete_refresh_token(token)
                         LOGGER.debug("Removed existing jukebox token")
-            
+
                 # Create a refresh token first
                 refresh_token = await self.hass.auth.async_create_refresh_token(
                     user,
