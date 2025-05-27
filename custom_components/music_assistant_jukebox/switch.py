@@ -95,7 +95,13 @@ class JukeboxAccessSwitch(JukeboxBaseMixin, SwitchEntity):
             # Only create new token if we don't have one stored
             if not self._token:
                 user = await self.hass.auth.async_get_owner()
-                
+
+           # First check for and remove any existing tokens with this name
+                for refresh_token in await self.hass.auth.async_get_refresh_tokens():
+                    if refresh_token.client_name == "jukeboxmanagement":
+                        await self.hass.auth.async_remove_refresh_token(refresh_token)
+                        LOGGER.debug("Removed existing jukebox token")
+                     
                 # Create a refresh token first
                 refresh_token = await self.hass.auth.async_create_refresh_token(
                     user,
