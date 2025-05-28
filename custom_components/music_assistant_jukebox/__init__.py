@@ -17,7 +17,8 @@ from .const import (
     HTML_FILE,
     BLUEPRINT_FILE,
     CONF_MEDIA_PLAYER,
-    CONF_MUSIC_ASSISTANT_ID
+    CONF_MUSIC_ASSISTANT_ID,
+    BG_FILE
 )
 PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER]
 
@@ -42,6 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         
         # Define files to copy including blueprint
         files_to_copy = {
+            "bg.jpg": BG_FILE
             "jukebox.html": HTML_FILE,
             "jukebox_controller.yaml": BLUEPRINT_FILE
         }
