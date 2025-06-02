@@ -43,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         
         # Define files to copy including blueprint
         files_to_copy = {
-            "bg.jpg": BG_FILE
+            "bg.jpg": BG_FILE,
             "jukebox.html": HTML_FILE,
             "jukebox_controller.yaml": BLUEPRINT_FILE
         }
