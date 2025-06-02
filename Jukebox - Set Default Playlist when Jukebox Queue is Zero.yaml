@@ -21,8 +21,8 @@ actions:
   - action: music_assistant.play_media
     metadata: {}
     data:
-      enqueue: add
-      media_id: <YOUR DEFAULT PARTY PLAYLIST HERE>
+      enqueue: play
+      media_id: <YOUR DEFAULT PARTY PLAYLIST NAME HERE>
       media_type: playlist
     target:
       entity_id: media_player.<YOUR MEDIA PLAYER HERE>
