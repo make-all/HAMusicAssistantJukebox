@@ -87,8 +87,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             # Replace placeholder values
             replacements = {
                 "your_music_assistant_config_id": entry.data[CONF_MUSIC_ASSISTANT_ID],
-                "media_player.your_speaker": entry.data[CONF_MEDIA_PLAYER],
-                "<your HA IP here>": base_url
+                "media_player.your_speaker": entry.data[CONF_MEDIA_PLAYER]
             }
 
             for old, new in replacements.items():
