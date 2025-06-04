@@ -92,40 +92,40 @@ class JukeboxAccessSwitch(JukeboxBaseMixin, SwitchEntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on access and generate token."""
         try:
-            if not self._token:
-                user = await self.hass.auth.async_get_owner()
-                
-                # Get all refresh tokens through the auth store
-                refresh_tokens = self.hass.auth._store.async_get_refresh_tokens()
-                # Remove existing tokens for jukeboxmanagement
-                for token in refresh_tokens:
-                    if token.client_name == "jukeboxmanagement":
-                        self.hass.auth._store.async_remove_refresh_token(token)
-                        LOGGER.debug("Removed existing jukebox token")
+            #if not self._token:
+            user = await self.hass.auth.async_get_owner()
+            
+            # Get all refresh tokens through the auth store
+            refresh_tokens = self.hass.auth._store.async_get_refresh_tokens()
+            # Remove existing tokens for jukeboxmanagement
+            for token in refresh_tokens:
+                if token.client_name == "jukeboxmanagement":
+                    self.hass.auth._store.async_remove_refresh_token(token)
+                    LOGGER.debug("Removed existing jukebox token")
 
-                # Create a refresh token first
-                refresh_token = await self.hass.auth.async_create_refresh_token(
-                    user,
-                    client_name="jukeboxmanagement",
-                    client_icon="mdi:music-box",
-                    token_type="long_lived_access_token",
-                )
-                
-                # Create an access token from the refresh token
-                self._token = self.hass.auth.async_create_access_token(refresh_token)
-                
-                LOGGER.debug("Created new access token: %s", self._token[:50] + "...")
-                
-                # Store token in config entry
-                new_data = dict(self.entry.data)
-                new_data["access_token"] = self._token
-                self.hass.config_entries.async_update_entry(
-                    self.entry,
-                    data=new_data
-                )
-                LOGGER.debug("Stored new token in config entry")
-            else:
-                LOGGER.debug("Using existing token: %s", self._token[:50] + "...")
+            # Create a refresh token first
+            refresh_token = await self.hass.auth.async_create_refresh_token(
+                user,
+                client_name="jukeboxmanagement",
+                client_icon="mdi:music-box",
+                token_type="long_lived_access_token",
+            )
+            
+            # Create an access token from the refresh token
+            self._token = self.hass.auth.async_create_access_token(refresh_token)
+            
+            LOGGER.debug("Created new access token: %s", self._token[:50] + "...")
+            
+            # Store token in config entry
+            new_data = dict(self.entry.data)
+            new_data["access_token"] = self._token
+            self.hass.config_entries.async_update_entry(
+                self.entry,
+                data=new_data
+            )
+            LOGGER.debug("Stored new token in config entry")
+            #else:
+                #LOGGER.debug("Using existing token: %s", self._token[:50] + "...")
         
             # Create token file regardless if token is new or existing
             token_dir = Path(self.hass.config.path(WWW_JUKEBOX_DIR))
