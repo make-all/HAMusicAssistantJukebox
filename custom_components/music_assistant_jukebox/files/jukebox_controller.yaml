@@ -53,7 +53,7 @@ action:
               entity_id: !input media_player
             response_variable: jukeboxqueuedetail
           - variables:
-              speaker_data: "{{ jukeboxqueuedetail[!input media_player] }}"
+              speaker_data: "{{ jukeboxqueuedetail[states.entity_id] }}"
           - variables:
               items_count: >-
                 {% set matches = speaker_data | regex_findall("'items': (\d+)") %}
@@ -83,6 +83,8 @@ action:
           - service: media_player.shuffle_set
             data:
               shuffle: false
+            target:
+              entity_id: !input media_player
           - service: switch.turn_on
             target:
               entity_id: switch.music_assistant_jukebox_jukebox_queue
@@ -97,6 +99,8 @@ action:
           - service: media_player.shuffle_set
             data:
               shuffle: true
+            target:
+              entity_id: !input media_player
           - service: switch.turn_off
             target:
               entity_id: switch.music_assistant_jukebox_jukebox_queue
