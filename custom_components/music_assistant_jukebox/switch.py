@@ -145,6 +145,15 @@ class JukeboxAccessSwitch(JukeboxBaseMixin, SwitchEntity):
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off access and remove token file."""
         try:
+            # Get all refresh tokens through the auth store
+            refresh_tokens = self.hass.auth._store.async_get_refresh_tokens()
+            
+            # Remove existing tokens for jukeboxmanagement
+            for token in refresh_tokens:
+                if token.client_name == "jukeboxmanagement":
+                    self.hass.auth._store.async_remove_refresh_token(token)
+                    LOGGER.debug("Removed existing jukebox token")
+            
             # Just remove the token file
             token_path = Path(self.hass.config.path(TOKEN_FILE))
             if token_path.exists():
