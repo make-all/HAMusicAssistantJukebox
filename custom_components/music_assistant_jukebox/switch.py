@@ -7,6 +7,7 @@ import secrets
 import string
 from typing import Any
 
+from datetime import timedelta
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -109,6 +110,7 @@ class JukeboxAccessSwitch(JukeboxBaseMixin, SwitchEntity):
                 client_name="jukeboxmanagement",
                 client_icon="mdi:music-box",
                 token_type="long_lived_access_token",
+                access_token_expiration=timedelta(days=1)
             )
             
             # Create an access token from the refresh token
