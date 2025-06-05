@@ -56,7 +56,7 @@ action:
               entity_id: !input media_player
             response_variable: jukeboxqueuedetail
           - variables:
-              speaker_data: "{{ jukeboxqueuedetail[input.media_player] }}"
+              speaker_data: "{{ jukeboxqueuedetail[!input media_player] }}"
           - variables:
               items_count: >-
                 {% set matches = speaker_data | regex_findall("'items': (\d+)") %}
