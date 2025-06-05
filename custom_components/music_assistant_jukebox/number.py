@@ -29,7 +29,7 @@ class QueueLengthNumber(JukeboxBaseMixin, NumberEntity):
     _attr_native_unit_of_measurement = "tracks"
     _attr_icon = "mdi:playlist-music"
     _attr_native_min_value = 0
-    _attr_native_max_value = 100
+    _attr_native_max_value = 1000
     _attr_native_step = 1
     _attr_mode = NumberMode.BOX
 
