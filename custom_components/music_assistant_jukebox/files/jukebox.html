@@ -16,6 +16,7 @@
         let API_TOKEN = null // Will be set after loading
         const MEDIA_PLAYER = "media_player.your_speaker"; // Your speaker entity to play the tuuuuuuunes
         const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA config ID
+        let queueCheckInterval = null; // Interval for checking queue updates
  </script>
     <style>
     
@@ -367,26 +368,170 @@
       color: #e8e6e6;
       font-size: 2em;
     }
+    
+    :root {
+      --m: 17.5;
+      --wavefreq: calc(75ms * var(--m));
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    section {
+      display: flex;
+      gap: 3px;
+      height:13px;
+      width:20px;
+    }
+    
+    @keyframes waveform {
+      0% {
+        transform: scaleY(.5);
+      }
+      50% {
+        transform: scaleY(1.5);
+      }
+      100% {
+        transform: scaleY(.5);
+      }
+    }
+    
+    .search-container {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 25px;
+        position: relative;
+        align-items: center;
+    }
+
+    .wave-section {
+        display: flex;
+        gap: 3px;
+        height: 13px;
+        margin-right: 10px;
+        align-items: center; /* Add this */
+        cursor: pointer; /* Add this for better UX */
+    }
+
+    [class*='wave'] {
+        height: 13px; /* Explicit height instead of aspect-ratio */
+        width: 3px; /* Explicit width */
+        min-width: 3px; /* Add this */
+        flex-shrink: 0; /* Add this */
+        animation: waveform var(--wavefreq) ease-in-out infinite forwards;
+        background-color: white;
+        border-radius: 15px;
+        will-change: transform; /* Add this for better performance */
+        -webkit-transform: translateZ(0); /* Add this for iOS */
+        transform: translateZ(0); /* Add this for iOS */
+    }
+
+    /* Add hover effect for better UX */
+    .wave-section:hover [class*='wave'] {
+        background-color: #ccc;
+    }
+    
+    .wave1 {
+      --wavefreq: calc(100ms * var(--m));
+    }
+    
+    .wave2 {
+      --wavefreq: calc(150ms * var(--m));
+    }
+    
+    .wave3 {
+      --wavefreq: calc(200ms * var(--m));
+    }
+    
+    .wave4 {
+      --wavefreq: calc(250ms * var(--m));
+    }
+
+    .popup-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .popup-content {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgb(74, 74, 74, 0.45);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        color: white;
+    }
+
+    .popup-close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .popup-close:hover {
+        color: #999;
+    }
+    
 
     </style>
 </head>
 <body>
+
+    <div class="popup-overlay" id="wavePopup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">×</button>
+            <h3 style="margin-bottom: 15px;">Now Playing</h3>
+            <div id="currentTrackInfo" style="margin-top: 15px;">
+                No track playing
+            </div>
+        </div>
+    </div>
+
     <div id="accessDenied">
         <h2>Queuing Closed.</h2>
         <p>Sorry, the jukebox is currently disabled. Until next time!</p>
     </div>
 
     <div id="page">
-        <div class="search-container">
-            <div style="position: relative; flex: 1;">
-                <div style="position: relative; display: flex; align-items: center;">
-                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: #666;"></i>
-                    <input type="text" id="searchInput" placeholder="Search song title..." autofocus style="padding-left: 35px;">
-                    <button class="clear-button" id="clearSearch">
-                        <i style="font-size: large;" class="fa-solid fa-xmark"></i>
-                    </button>
-                    <img src="https://i.gifer.com/6oa.gif" alt="Loading..." class="loader" id="searchLoader">
-                </div>
+       <div class="search-container">
+            <div id="waveform">
+                <section class="wave-section">
+                    <div class="wave0"></div>
+                    <div class="wave1"></div>
+                    <div class="wave2"></div>
+                    <div class="wave3"></div>
+                    <div class="wave4"></div>
+                </section>
+            </div>
+            <div style="position: relative; display: flex; align-items: center; flex: 1;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: #666;"></i>
+                <input type="text" id="searchInput" placeholder="Search song title..." autofocus style="padding-left: 35px;">
+                <button class="clear-button" id="clearSearch">
+                    <i style="font-size: large;" class="fa-solid fa-xmark"></i>
+                </button>
+                <img src="https://i.gifer.com/6oa.gif" alt="Loading..." class="loader" id="searchLoader">
             </div>
             <button style="display: none;" id="searchButton">Search</button>
         </div>
@@ -416,6 +561,9 @@
     </div>
 
     <script>
+
+        
+
         async function getApiToken() {
             try {
                 // Add timestamp to URL to prevent caching
@@ -446,6 +594,7 @@
         // API Endpoints
         const CHECK_API_ENDPOINT = HAURL+'/api/states/switch.music_assistant_jukebox_jukebox_allow_access';
         const SEARCH_API_ENDPOINT = HAURL+'/api/services/music_assistant/search?return_response';
+        const GETQUEUE_API_ENDPOINT = HAURL+'/api/services/music_assistant/get_queue?return_response';
         const PLAY_API_ENDPOINT = HAURL+'/api/services/music_assistant/play_media';
         const NOTIFY_API_ENDPOINT = HAURL+'/api/events/song_queued';
         const CHECK_QUEUE_MODE_ENDPOINT = HAURL+'/api/states/switch.music_assistant_jukebox_jukebox_queue';
@@ -529,6 +678,110 @@
                 document.getElementById('songResults').innerHTML = '';
             });
         });
+
+        async function getQueue() {
+            try {
+                const queueRequest = {
+                    entity_id: MEDIA_PLAYER
+                };
+
+                const response = await fetch(GETQUEUE_API_ENDPOINT, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(queueRequest)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                const queueData = data.service_response[MEDIA_PLAYER];
+
+                if (queueData && queueData.current_item) {
+                    const currentTrackInfo = document.getElementById('currentTrackInfo');
+                    const currentTrack = queueData.current_item;
+                    
+                    const artistNames = currentTrack.media_item.artists
+                        .map(artist => artist.name)
+                        .join(', ');
+
+                    // Add album art and track info with improved styling
+                    currentTrackInfo.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div style="flex-shrink: 0;">
+                                ${currentTrack.media_item.image ? 
+                                    `<img src="${currentTrack.media_item.image}" 
+                                        alt="Album Art" 
+                                        style="width: 80px; height: 80px; border-radius: 4px; object-fit: cover;">` :
+                                    `<div style="width: 80px; height: 80px; border-radius: 4px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-music" style="font-size: 24px; color: #666;"></i>
+                                    </div>`
+                                }
+                            </div>
+                            <div style="flex-grow: 1; text-align: left;">
+                                <div style="margin-bottom: 5px;">
+                                    <strong>${currentTrack.media_item.name}</strong>
+                                </div>
+                                <div style="color: #ccc; font-size: 0.9em;">
+                                    ${artistNames}
+                                </div>
+                                <div style="margin-top: 8px; font-size: 0.9em; color: #999;">
+                                    ${formatTime(queueData.elapsed_time)} / ${formatTime(currentTrack.duration)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Show next track if available
+                    if (queueData.next_item) {
+                        const nextTrack = queueData.next_item;
+                        currentTrackInfo.innerHTML += `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <div style="color: #999; font-size: 0.9em; margin-bottom: 10px;">Next up:</div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="flex-shrink: 0;">
+                                        ${nextTrack.media_item.image ? 
+                                            `<img src="${nextTrack.media_item.image}" 
+                                                alt="Next Album Art" 
+                                                style="width: 80px; height: 80px; border-radius: 4px; object-fit: cover;">` :
+                                            `<div style="width: 80px; height: 80px; border-radius: 4px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+                                                <i class="fa-solid fa-music" style="font-size: 18px; color: #666;"></i>
+                                            </div>`
+                                        }
+                                    </div>
+                                    <div style="flex-grow: 1; text-align: left;">
+                                        <div style="margin-bottom: 5px;">
+                                            <strong>${nextTrack.media_item.name}</strong>
+                                        </div>
+                                        <div style="color: #ccc; font-size: 0.9em;">
+                                            ${nextTrack.media_item.artists.map(artist => artist.name).join(', ')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    document.getElementById('currentTrackInfo').textContent = 'No track playing';
+                }
+
+            } catch (error) {
+                console.error('Error fetching queue:', error);
+                document.getElementById('currentTrackInfo').textContent = 'Error fetching queue information';
+            }
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
 
         async function searchSongs() {
 
@@ -985,6 +1238,44 @@
         
         FocusOnInput();
         document.getElementById("searchInput").focus();
+
+
+        function openPopup() {
+            document.getElementById('wavePopup').style.display = 'block';
+            // Initial queue check
+            getQueue();
+            // Start periodic checks
+            queueCheckInterval = setInterval(getQueue, 5000);
+        }
+
+        function closePopup() {
+            document.getElementById('wavePopup').style.display = 'none';
+            // Stop checking queue when popup is closed
+            if (queueCheckInterval) {
+                clearInterval(queueCheckInterval);
+                queueCheckInterval = null;
+            }
+        }
+
+        // Update the wave-section click event listener
+        document.querySelector('#waveform').addEventListener('click', function() {
+            openPopup();
+        });
+
+        // Update the outside click handler
+        document.getElementById('wavePopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        // Update the ESC key handler
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+            }
+        });
+
     </script>
 </body>
 
