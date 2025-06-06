@@ -4,7 +4,7 @@ triggers:
   - trigger: state
     entity_id:
       - input_number.jukebox_queue_length
-    to: "1.0"
+    to: "0.0"
 conditions: []
 actions:
   - action: input_boolean.turn_off
