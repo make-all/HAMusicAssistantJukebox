@@ -6,6 +6,7 @@ A Home Assistant integration that provides a web-based song request system that 
 
 ## Features
 - Real-time song search across all connected Music Assistant providers
+- Check whats playing and Up Next in real time.
 - Minimalist responsive design with album artwork display
 - No login required for guests, just share the URL
 - Queue management through Home Assistant entities
@@ -47,6 +48,7 @@ Before installing this integration, make sure you have:
 
 ## Usage
 Switch on the jukebox using "JukeBox: Allow access" switch.
+
 Access the jukebox interface at:
 ```
 http://homeassistant:8123/local/jukebox/jukebox.html
