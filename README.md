@@ -26,7 +26,7 @@ Before installing this integration, make sure you have:
 ### HACS (Recommended)
 1. Add this repository to HACS as a custom repository
    - HACS > Menu > Custom repositories
-   - URL: `https://github.com/DJS91/music-assistant-jukebox`
+   - URL: `https://github.com/DJS91/HAMusicAssistantJukebox`
    - Category: Integration
 2. Click Install
 3. Restart Home Assistant
