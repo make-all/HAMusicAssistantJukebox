@@ -1,7 +1,7 @@
 {
   "domain": "music_assistant_jukebox",
   "name": "Music Assistant Jukebox",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "documentation": "https://github.com/DJS91/HAMusicAssistantJukebox",
   "dependencies": [
     "music_assistant"
