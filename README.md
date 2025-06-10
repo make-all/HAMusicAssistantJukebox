@@ -65,8 +65,8 @@ The integration adds these entities to Home Assistant:
 - `number.jukebox_queue_length`: Shows current queue length (No manual adjustment required, Managed by automation)
 
 ### Sensor
-- `music_assistant_jukebox_external_qr_code`: Jukebox UI Access QR code for sharing on dashboards
-- `music_assistant_jukebox_internal_qr_code`: Jukebox UI Access QR code for sharing on dashboards
+- `music_assistant_jukebox_external_qr_code`: Jukebox UI Access QR code image for easy sharing on dashboards
+- `music_assistant_jukebox_internal_qr_code`: Jukebox UI Access QR code image for easy sharing on dashboards
 
 ## Automation Blueprint
 
