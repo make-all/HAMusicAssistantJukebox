@@ -49,7 +49,7 @@ Before installing this integration, make sure you have:
 ## Usage
 Switch on the jukebox using "JukeBox: Allow access" switch.
 
-Access the jukebox interface at:
+Scan the QR Code entity of choice or access the jukebox interface directly at:
 ```
 http://homeassistant:8123/local/jukebox/jukebox.html
 ```
@@ -64,6 +64,9 @@ The integration adds these entities to Home Assistant:
 ### Number
 - `number.jukebox_queue_length`: Shows current queue length (No manual adjustment required, Managed by automation)
 
+### Sensor
+- `music_assistant_jukebox_external_qr_code`: Jukebox UI Access QR code for sharing on dashboards
+- `music_assistant_jukebox_internal_qr_code`: Jukebox UI Access QR code for sharing on dashboards
 
 ## Automation Blueprint
 
