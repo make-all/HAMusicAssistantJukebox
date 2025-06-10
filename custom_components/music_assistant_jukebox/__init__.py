@@ -4,7 +4,9 @@ from __future__ import annotations
 import os
 import aiofiles
 import shutil
+import qrcode
 from pathlib import Path
+from homeassistant.helpers import network
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -20,7 +22,7 @@ from .const import (
     CONF_MUSIC_ASSISTANT_ID,
     BG_FILE
 )
-PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER]
+PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER, Platform.IMAGE]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -34,6 +36,71 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # Create jukebox directory in www if it doesn't exist
         www_path = Path(hass.config.path(WWW_JUKEBOX_DIR))
         www_path.mkdir(parents=True, exist_ok=True)
+        LOGGER.info("Created/verified www directory at: %s", www_path)
+
+        # Generate QR codes for URLs
+        #internal_url = hass.config.internal_url or "http://homeassistant.local:8123/local/jukebox/jukebox.html"
+        #external_url = hass.config.external_url or "http://homeassistant.local:8123/local/jukebox/jukebox.html"
+        
+        try:
+            internal_url = str(network.get_url(hass, allow_internal=True, allow_external=False))
+            external_url = str(network.get_url(hass, allow_internal=False, allow_external=True))
+     
+            # Append jukebox path
+            internal_url = f"{internal_url}/local/jukebox/jukebox.html"
+            external_url = f"{external_url}/local/jukebox/jukebox.html"
+            
+            LOGGER.info("URLs determined using network helpers - Internal: %s, External: %s", 
+                       internal_url, external_url)
+            
+        except Exception as err:
+            LOGGER.warning("Could not get URLs using network helpers: %s", err)
+            # Fallback to default URL
+            default_url = "http://homeassistant.local:8123/local/jukebox/jukebox.html"
+            internal_url = default_url
+            external_url = default_url
+            LOGGER.info("Using fallback URLs: %s", default_url)
+
+        LOGGER.info("URLs found - Internal: %s, External: %s", internal_url, external_url)
+
+        if internal_url:
+            try:
+                qr = qrcode.QRCode(
+                    version=1,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=2,
+                )
+                qr.add_data(internal_url)
+                qr.make(fit=True)
+                qr_image = qr.make_image(fill_color="black", back_color="white")
+                
+                qr_path = www_path / "internal_url_qr.png"
+                LOGGER.info("Saving internal QR code to: %s", qr_path)
+                qr_image.save(str(qr_path))  # Convert Path to string
+                LOGGER.info("Created QR code for internal URL: %s", internal_url)
+            except Exception as err:
+                LOGGER.error("Error creating internal URL QR code: %s", err)
+
+        if external_url:
+            try:
+                qr = qrcode.QRCode(
+                    version=1,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=2,
+                )
+                qr.add_data(external_url)
+                qr.make(fit=True)
+                qr_image = qr.make_image(fill_color="black", back_color="white")
+                
+                qr_path = www_path / "external_url_qr.png"
+                LOGGER.info("Saving external QR code to: %s", qr_path)
+                qr_image.save(str(qr_path))  # Convert Path to string
+                LOGGER.info("Created QR code for external URL: %s", external_url)
+            except Exception as err:
+                LOGGER.error("Error creating external URL QR code: %s", err)
+
 
         # Get component directory path
         component_path = Path(__file__).parent
