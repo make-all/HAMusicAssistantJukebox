@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
 
+
 from .const import (
     DOMAIN,
     LOGGER,
@@ -38,20 +39,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         www_path.mkdir(parents=True, exist_ok=True)
         LOGGER.info("Created/verified www directory at: %s", www_path)
 
-        # Generate QR codes for URLs
-        #internal_url = hass.config.internal_url or "http://homeassistant.local:8123/local/jukebox/jukebox.html"
-        #external_url = hass.config.external_url or "http://homeassistant.local:8123/local/jukebox/jukebox.html"
-        
         try:
             internal_url = str(network.get_url(hass, allow_internal=True, allow_external=False))
             external_url = str(network.get_url(hass, allow_internal=False, allow_external=True))
-     
+        
             # Append jukebox path
             internal_url = f"{internal_url}/local/jukebox/jukebox.html"
             external_url = f"{external_url}/local/jukebox/jukebox.html"
             
             LOGGER.info("URLs determined using network helpers - Internal: %s, External: %s", 
-                       internal_url, external_url)
+                        internal_url, external_url)
             
         except Exception as err:
             LOGGER.warning("Could not get URLs using network helpers: %s", err)
@@ -100,8 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 LOGGER.info("Created QR code for external URL: %s", external_url)
             except Exception as err:
                 LOGGER.error("Error creating external URL QR code: %s", err)
-
-
+        
         # Get component directory path
         component_path = Path(__file__).parent
 
@@ -128,46 +124,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             else:
                 LOGGER.error("Source file %s not found", src_file)
 
-        # Update jukebox.html with correct values
-        html_file = Path(hass.config.path(HTML_FILE))
-        if html_file.exists():
-            async with aiofiles.open(html_file, mode='r') as file:
-                content = await file.read()
-
-            # Get URL - try internal first, then external
-            internal_url = hass.config.internal_url
-            external_url = hass.config.external_url
-            # This method does not work setting it to default hostname for now
-            base_url = "homeassistant.local"#internal_url or external_url
-
-            if not base_url:
-                # Fallback to core config base_url
-                if hasattr(hass.config, 'api') and hass.config.api.base_url:
-                    base_url = hass.config.api.base_url
-                else:
-                    LOGGER.error("No internal or external URL configured in Home Assistant")
-                    return False
-
-            # Remove trailing slash
-            base_url = base_url.rstrip("/")
-            
-            # Replace placeholder values
-            replacements = {
-                "your_music_assistant_config_id": entry.data[CONF_MUSIC_ASSISTANT_ID],
-                "media_player.your_speaker": entry.data[CONF_MEDIA_PLAYER]
-            }
-
-            for old, new in replacements.items():
-                if new is None:
-                    LOGGER.error("Missing replacement value for %s", old)
-                    return False
-                content = content.replace(old, str(new))
-
-            # Write updated content back
-            async with aiofiles.open(html_file, mode='w') as file:
-                await file.write(content)
-            
-            LOGGER.info("Updated jukebox.html with: %s", replacements)
+        # ... rest of your existing setup code ...
 
     except Exception as err:
         LOGGER.error("Error setting up files: %s", err)
@@ -175,11 +132,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    
+    # Register panel AFTER everything else is set up
+    await async_register_panel(hass, entry)
+    
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+    
+    # Remove the panel first
+    await async_remove_panel(hass)
+    
     # Unload platforms
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     
@@ -204,6 +169,87 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except Exception as err:
             LOGGER.error("Error during cleanup: %s", err)
         
-        hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN].pop(entry.entry_id, None)
 
     return unload_ok
+
+
+async def async_register_panel(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Register the sidebar panel."""
+    try:
+
+        # Method 1: Try direct panel registration
+        try:
+            from homeassistant.components.frontend import async_register_built_in_panel
+            
+            # Register as a built-in panel
+            async_register_built_in_panel(
+                hass,
+                component_name="iframe",
+                sidebar_title="Music Assistant Jukebox",
+                sidebar_icon="mdi:music",
+                frontend_url_path="music_assistant_jukebox",
+                config={"url": "/local/jukebox/jukebox.html"},
+                require_admin=False,
+            )
+            LOGGER.info("Successfully registered panel using built-in method")
+            return
+            
+        except Exception as err:
+            LOGGER.warning("Built-in panel registration failed: %s", err)
+        
+        # Method 2: Try service call as fallback
+        if "panel_iframe" in hass.config.components:
+            await hass.services.async_call(
+                "panel_iframe",
+                "register",
+                {
+                    "frontend_url_path": "music_assistant_jukebox",
+                    "sidebar_title": "Music Assistant Jukebox",
+                    "sidebar_icon": "mdi:music",
+                    "url": "/local/jukebox/jukebox.html",
+                    "require_admin": False,
+                },
+                blocking=True,
+            )
+            LOGGER.info("Successfully registered panel using service call")
+        else:
+            LOGGER.error("panel_iframe component not available")
+            
+    except Exception as err:
+        LOGGER.error("Failed to register panel: %s", err)
+
+
+async def async_remove_panel(hass: HomeAssistant) -> None:
+    """Remove the sidebar panel."""
+    try:
+        # Try to remove the panel
+        from homeassistant.components.frontend import async_remove_panel
+        
+        async_remove_panel(hass, "music_assistant_jukebox")
+        LOGGER.info("Successfully removed panel")
+        
+    except Exception as err:
+        LOGGER.warning("Failed to remove panel: %s", err)
+    """Register the sidebar panel."""
+    try:
+        # Check if panel_iframe is available
+        if "panel_iframe" in hass.config.components:
+            # Register using service call
+            await hass.services.async_call(
+                "panel_iframe",
+                "register",
+                {
+                    "frontend_url_path": "music_assistant_jukebox",
+                    "sidebar_title": "Music Assistant Jukebox",
+                    "sidebar_icon": "mdi:music",
+                    "url": "/local/jukebox/jukebox.html",
+                    "require_admin": False,
+                },
+                blocking=True,
+            )
+            LOGGER.info("Successfully registered panel for %s", DOMAIN)
+        else:
+            LOGGER.error("panel_iframe component not available")
+    except Exception as err:
+        LOGGER.error("Failed to register panel: %s", err)
