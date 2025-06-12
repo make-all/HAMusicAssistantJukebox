@@ -124,7 +124,47 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             else:
                 LOGGER.error("Source file %s not found", src_file)
 
-        # ... rest of your existing setup code ...
+        # Update jukebox.html with correct valuesMore actions
+        html_file = Path(hass.config.path(HTML_FILE))
+        if html_file.exists():
+            async with aiofiles.open(html_file, mode='r') as file:
+                content = await file.read()
+
+            # Get URL - try internal first, then external
+            internal_url = hass.config.internal_url
+            external_url = hass.config.external_url
+            # This method does not work setting it to default hostname for now
+            base_url = "homeassistant.local"#internal_url or external_url
+
+            if not base_url:
+                # Fallback to core config base_url
+                if hasattr(hass.config, 'api') and hass.config.api.base_url:
+                    base_url = hass.config.api.base_url
+                else:
+                    LOGGER.error("No internal or external URL configured in Home Assistant")
+                    return False
+
+            # Remove trailing slash
+            base_url = base_url.rstrip("/")
+
+            # Replace placeholder values
+            replacements = {
+                "your_music_assistant_config_id": entry.data[CONF_MUSIC_ASSISTANT_ID],
+                "media_player.your_speaker": entry.data[CONF_MEDIA_PLAYER],
+                "<your HA IP here>": base_url
+            }
+
+            for old, new in replacements.items():
+                if new is None:
+                    LOGGER.error("Missing replacement value for %s", old)
+                    return False
+                content = content.replace(old, str(new))
+
+            # Write updated content back
+            async with aiofiles.open(html_file, mode='w') as file:
+                await file.write(content)
+
+            LOGGER.info("Updated jukebox.html with: %s", replacements)
 
     except Exception as err:
         LOGGER.error("Error setting up files: %s", err)
