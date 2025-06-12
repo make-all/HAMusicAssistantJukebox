@@ -2,7 +2,7 @@ blueprint:
   name: "Music Assistant Jukebox Controller"
   description: "Controls the Music Assistant Jukebox functionality including queue management and playlist fallback"
   domain: automation
-  source_url: https://github.com/TheOddPirate/music-assistant-jukebox
+  source_url: https://github.com/DJS91/HAMusicAssistantJukebox
   input:
     media_player:
       name: Media Player
@@ -92,7 +92,19 @@ action:
               enqueue: replace
               media_id: !input default_playlist
               media_type: playlist
-
+          - if:
+              - condition: state
+                entity_id: switch.music_assistant_jukebox_jukebox_play_music_on_start
+                state: "on"
+            then:
+              - target:
+                  entity_id: !input media_player
+                data:
+                  enqueue: replace
+                  media_id: !input default_playlist
+                  media_type: playlist
+                action: music_assistant.play_media
+            alias: Play Default playlist on start
       - conditions:
           - condition: trigger
             id: Queue Event
