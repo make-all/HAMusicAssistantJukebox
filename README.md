@@ -51,7 +51,9 @@ Switch on the jukebox using "JukeBox: Allow access" switch.
 
 Access the jukebox via the new "Music Assistant Jukebox" Sidebar Panel OR
 
-Scan the QR Code entity of choice or access the jukebox interface directly at:
+Scan the QR Code entity of choice OR 
+
+Access the jukebox interface directly at:
 ```
 http://homeassistant:8123/local/jukebox/jukebox.html
 ```
@@ -62,7 +64,8 @@ The integration adds these entities to Home Assistant:
 ### Switches
 - `switch.jukebox_queue`: Enable/disable queuing of songs (No manual control required. Managed by automation.)
 - `switch.jukebox_allow_access`: Enable/disable access to the jukebox interface
-
+- `switch.music_assistant_jukebox_jukebox_play_music_on_start`: Turn on/off if the default playlist plays automatically when the jukbox is turned on.
+- 
 ### Number
 - `number.jukebox_queue_length`: Shows current queue length (No manual adjustment required, Managed by automation)
 
