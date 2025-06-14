@@ -1020,7 +1020,7 @@
                                     ${artistNames}
                                 </div>
                                 <div style="margin-top: 8px; font-size: 0.9em; color: #999;">
-                                    ${formatTime(queueData.elapsed_time)} / ${formatTime(currentTrack.duration)}
+                                    ${formatTime(queueData.elapsed_time, currentTrack.duration)} / ${formatTime(currentTrack.duration, currentTrack.duration)}
                                 </div>
                             </div>
                         </div>
@@ -1065,7 +1065,17 @@
             }
         }
 
-        function formatTime(seconds) {
+        function formatTime(seconds, duration) {
+            // Check if elapsed time exceeds duration
+            if (seconds > duration) {
+                return '--:--';
+            }
+            
+            // If seconds is not a valid number or negative, return '--:--'
+            if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) {
+                return '--:--';
+            }
+            
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;

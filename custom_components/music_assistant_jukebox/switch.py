@@ -32,6 +32,7 @@ async def async_setup_entry(
     switches = [
         JukeboxQueueSwitch(hass, entry),
         JukeboxAccessSwitch(hass, entry),
+        JukeboxPlayOnStartSwitch(hass, entry),
     ]
     async_add_entities(switches)
 
@@ -165,3 +166,54 @@ class JukeboxAccessSwitch(JukeboxBaseMixin, SwitchEntity):
             
         except Exception as err:
             LOGGER.error("Failed to remove access token file: %s", err)
+
+class JukeboxPlayOnStartSwitch(JukeboxBaseMixin, SwitchEntity):
+    """Representation of the Jukebox Play on Start switch."""
+
+    _attr_has_entity_name = True
+    _attr_name = "JukeBox: Play Music on Start"
+    _attr_unique_id = "jukebox_play_on_start"
+    _attr_icon = "mdi:play-circle"
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the switch."""
+        self.hass = hass
+        self.entry = entry
+        self._attr_is_on = entry.data.get("play_on_start", False)
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn on play music on start."""
+        try:
+            # Store setting in config entry
+            new_data = dict(self.entry.data)
+            new_data["play_on_start"] = True
+            self.hass.config_entries.async_update_entry(
+                self.entry,
+                data=new_data
+            )
+            
+            self._attr_is_on = True
+            self.async_write_ha_state()
+            LOGGER.debug("Play on start enabled")
+            
+        except Exception as err:
+            LOGGER.error("Failed to enable play on start: %s", err)
+            raise
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn off play music on start."""
+        try:
+            # Store setting in config entry
+            new_data = dict(self.entry.data)
+            new_data["play_on_start"] = False
+            self.hass.config_entries.async_update_entry(
+                self.entry,
+                data=new_data
+            )
+            
+            self._attr_is_on = False
+            self.async_write_ha_state()
+            LOGGER.debug("Play on start disabled")
+            
+        except Exception as err:
+            LOGGER.error("Failed to disable play on start: %s", err)

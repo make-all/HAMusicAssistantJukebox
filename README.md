@@ -26,7 +26,7 @@ Before installing this integration, make sure you have:
 ### HACS (Recommended)
 1. Add this repository to HACS as a custom repository
    - HACS > Menu > Custom repositories
-   - URL: `https://github.com/DJS91/music-assistant-jukebox`
+   - URL: `https://github.com/DJS91/HAMusicAssistantJukebox`
    - Category: Integration
 2. Click Install
 3. Restart Home Assistant
@@ -49,7 +49,11 @@ Before installing this integration, make sure you have:
 ## Usage
 Switch on the jukebox using "JukeBox: Allow access" switch.
 
-Access the jukebox interface at:
+Access the jukebox via the new "Music Assistant Jukebox" Sidebar Panel OR
+
+Scan the QR Code entity of choice OR 
+
+Access the jukebox interface directly at:
 ```
 http://homeassistant:8123/local/jukebox/jukebox.html
 ```
@@ -60,10 +64,14 @@ The integration adds these entities to Home Assistant:
 ### Switches
 - `switch.jukebox_queue`: Enable/disable queuing of songs (No manual control required. Managed by automation.)
 - `switch.jukebox_allow_access`: Enable/disable access to the jukebox interface
-
+- `switch.music_assistant_jukebox_jukebox_play_music_on_start`: Turn on/off if the default playlist plays automatically when the jukbox is turned on.
+- 
 ### Number
 - `number.jukebox_queue_length`: Shows current queue length (No manual adjustment required, Managed by automation)
 
+### Sensor
+- `music_assistant_jukebox_external_qr_code`: External Jukebox UI Access QR code image for easy sharing on dashboards for users not on your network
+- `music_assistant_jukebox_internal_qr_code`: Internal Jukebox UI Access QR code image for easy sharing for users on your network
 
 ## Automation Blueprint
 
