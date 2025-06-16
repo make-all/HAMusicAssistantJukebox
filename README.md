@@ -24,6 +24,7 @@ Before installing this integration, make sure you have:
 ## Installation
 
 ### HACS (Recommended)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PilaScat&repository=HAMusicAssistantJukebox&category=Integration)
 1. Add this repository to HACS as a custom repository
    - HACS > Menu > Custom repositories
    - URL: `https://github.com/DJS91/HAMusicAssistantJukebox`
@@ -88,12 +89,3 @@ To use the blueprint:
 4. Configure:
    - Media Player: Select your Music Assistant media player
    - Default Playlist: Enter the name of your fallback playlist
-
-## Contributing
-
-Feel free to contribute! Open an issue or submit a PR.
-
-## Credits
-
-Based on the original [HAMusicAssistantJukebox](https://github.com/DJS91/HAMusicAssistantJukebox) by DJS91.
-Integration developed by @DJS91 and @TheOddPirate.
