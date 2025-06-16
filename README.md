@@ -1,8 +1,8 @@
-# <img src="https://github.com/PilaScat/HAMusicAssistantJukebox/blob/main/logo.png" width="35" height="35"> Music Assistant Jukebox Integration
+# <img src="logo.png" width="35" height="35"> Music Assistant Jukebox Integration
 
 A Home Assistant integration that provides a web-based song request system that integrates with Music Assistant to create an interactive jukebox experience for guests!
 
-![Jukebox Interface](https://github.com/PilaScat/HAMusicAssistantJukebox/blob/main/showcase.avifs?raw=true)
+![Jukebox Interface](showcase.avifs)
 
 ## Features
 - Real-time song search across all connected Music Assistant providers
@@ -24,7 +24,7 @@ Before installing this integration, make sure you have:
 ## Installation
 
 ### HACS (Recommended)
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PilaScat&repository=HAMusicAssistantJukebox&category=Integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=DJS91&repository=HAMusicAssistantJukebox&category=Integration)
 1. Add this repository to HACS as a custom repository
    - HACS > Menu > Custom repositories
    - URL: `https://github.com/DJS91/HAMusicAssistantJukebox`
