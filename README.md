@@ -1,4 +1,4 @@
-# <img src="https://github.com/PilaScat/HAMusicAssistantJukebox/blob/main/logo.png" width="32" height="32"> Music Assistant Jukebox Integration
+# <img src="https://github.com/PilaScat/HAMusicAssistantJukebox/blob/main/logo.png" width="35" height="35"> Music Assistant Jukebox Integration
 
 A Home Assistant integration that provides a web-based song request system that integrates with Music Assistant to create an interactive jukebox experience for guests!
 
