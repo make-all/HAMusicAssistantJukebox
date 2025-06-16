@@ -2,7 +2,7 @@
 
 A Home Assistant integration that provides a web-based song request system that integrates with Music Assistant to create an interactive jukebox experience for guests!
 
-![Jukebox Interface](https://github.com/DanStennett/HAMusicAssistantJukebox/blob/main/readme_image.jpg?raw=true)
+![Jukebox Interface](https://github.com/PilaScat/HAMusicAssistantJukebox/blob/main/showcase.avif?raw=true)
 
 ## Features
 - Real-time song search across all connected Music Assistant providers
@@ -97,4 +97,3 @@ Feel free to contribute! Open an issue or submit a PR.
 
 Based on the original [HAMusicAssistantJukebox](https://github.com/DJS91/HAMusicAssistantJukebox) by DJS91.
 Integration developed by @DJS91 and @TheOddPirate.
-
