@@ -181,7 +181,8 @@ class JukeboxPlayOnStartSwitch(JukeboxBaseMixin, SwitchEntity):
         """Initialize the switch."""
         self.hass = hass
         self.entry = entry
-        self._attr_is_on = entry.data.get("play_on_start", False)
+        self._attr_is_on = True
+        #self._attr_is_on = entry.data.get("play_on_start", False)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on play music on start."""
