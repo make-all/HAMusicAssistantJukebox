@@ -68,7 +68,7 @@ The integration adds these entities to Home Assistant:
 - `switch.jukebox_queue`: Enable/disable queuing of songs (No manual control required. Managed by automation.)
 - `switch.jukebox_allow_access`: Enable/disable access to the jukebox interface
 - `switch.music_assistant_jukebox_jukebox_play_music_on_start`: Turn on/off if the default playlist plays automatically when the jukbox is turned on.
-- 
+  
 ### Number
 - `number.jukebox_queue_length`: Shows current queue length (No manual adjustment required, Managed by automation)
 
@@ -94,7 +94,7 @@ To use the blueprint:
 
 ## Credits
 Big thanks to:
-- [OddPirate](https://github.com/TheOddPirate) for their contrubutions in making this into an integration.
+- [OddPirate](https://github.com/TheOddPirate) for their contrubutions to making this into an integration.
 
-- [PilaScat](https://github.com/PilaScat) for their contributions to clean up and UI improvements.
+- [PilaScat](https://github.com/PilaScat) for their contributions to clean up, polish and UI improvements.
 
