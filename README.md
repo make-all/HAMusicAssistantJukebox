@@ -91,3 +91,10 @@ To use the blueprint:
 4. Configure:
    - Media Player: Select your Music Assistant media player
    - Default Playlist: Enter the name of your fallback playlist
+
+## Credits
+Big thanks to:
+- [OddPirate](https://github.com/TheOddPirate) for their contrubutions in making this into an integration.
+
+- [PilaScat](https://github.com/PilaScat) for their contributions to clean up and UI improvements.
+
