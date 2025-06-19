@@ -23,13 +23,7 @@
         const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA config ID
         let queueCheckInterval = null; // Interval for checking queue updates
     </script>
-    <style>
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:focus {
-            transition: background-color 0s 600000s, color 0s 600000s !important;
-        }
-        
+   <style>
         #placeholderImage:not([style*="display: none"])~.results-table thead {
             display: none;
         }
@@ -589,35 +583,45 @@
             height: 13px;
             margin-right: 10px;
             align-items: center;
-            /* Add this */
             cursor: pointer;
-            /* Add this for better UX */
+            /* Ensure the entire section is clickable */
+            width: 100%;
+            position: relative;
         }
 
+        #waveform {
+            width: 40px;
+            margin: 0px;
+            cursor: pointer; /* Add cursor pointer to the entire waveform */
+            padding: 5px; /* Add some padding to increase clickable area */
+            border-radius: 4px; /* Optional: add slight rounding */
+            transition: background-color 0.2s ease; /* Optional: add hover effect */
+        }
+        /*
+        #waveform:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        */
+        
         [class*='wave'] {
             height: 13px;
-            /* Explicit height instead of aspect-ratio */
             width: 3px;
-            /* Explicit width */
             min-width: 3px;
-            /* Add this */
             flex-shrink: 0;
-            /* Add this */
             animation: waveform var(--wavefreq) ease-in-out infinite forwards;
             background-color: white;
             border-radius: 15px;
             will-change: transform;
-            /* Add this for better performance */
             -webkit-transform: translateZ(0);
-            /* Add this for iOS */
             transform: translateZ(0);
-            /* Add this for iOS */
+            pointer-events: none; /* Prevent individual waves from capturing clicks */
         }
 
-        /* Add hover effect for better UX */
+        /* Add hover effect for better UX 
         .wave-section:hover [class*='wave'] {
             background-color: #ccc;
         }
+        */
 
         .wave1 {
             --wavefreq: calc(100ms * var(--m));
