@@ -6,11 +6,12 @@ A Home Assistant integration that provides a web-based song request system that 
 
 ## Features
 - Real-time song search across all connected Music Assistant providers
-- Check whats Now Playing and Up Next in real time.
 - Minimalist responsive design with album artwork display
+- Check whats Now Playing and Up Next in real time.
 - No login required for guests, just share the URL
 - Queue management through Home Assistant entities
 - Auto queues a default party playlist when the request queue is empty
+- Control queuing frequency (limit queue spamming) 
 - Access control through Home Assistant
 - Auto revoking/creating access tokens for security
 
@@ -71,7 +72,8 @@ The integration adds these entities to Home Assistant:
   
 ### Number
 - `number.jukebox_queue_length`: Shows current queue length (No manual adjustment required, Managed by automation)
-
+- `number.music_assistant_jukebox_jukebox_queuing_delay`: Set a delay between song requests for guests (seconds) (0 = off)
+  
 ### Sensor
 - `music_assistant_jukebox_external_qr_code`: External Jukebox UI Access QR code image for easy sharing on dashboards for users not on your network
 - `music_assistant_jukebox_internal_qr_code`: Internal Jukebox UI Access QR code image for easy sharing for users on your network
