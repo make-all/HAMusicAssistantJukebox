@@ -22,6 +22,8 @@
         const MEDIA_PLAYER = "media_player.your_speaker"; // Your speaker entity to play the music
         const MUSIC_ASSISTANT_CONFIG = "your_music_assistant_config_id"; // Your MA config ID
         let queueCheckInterval = null; // Interval for checking queue updates
+        let lastQueueTime = 0;
+        let queueDelaySeconds = 0;
     </script>
    <style>
         input, select {
@@ -787,6 +789,7 @@
         const PLAY_API_ENDPOINT = HAURL + '/api/services/music_assistant/play_media';
         const NOTIFY_API_ENDPOINT = HAURL + '/api/events/song_queued';
         const CHECK_QUEUE_MODE_ENDPOINT = HAURL + '/api/states/switch.music_assistant_jukebox_jukebox_queue';
+        const QUEUE_DELAY_ENDPOINT = HAURL + '/api/states/number.music_assistant_jukebox_jukebox_queue_delay';
 
         function FocusOnInput() {
             var element = document.getElementById('searchInput');
@@ -998,6 +1001,30 @@
             }
         }
 
+        async function getQueueDelay() {
+            try {
+                const response = await fetch(QUEUE_DELAY_ENDPOINT, {
+                    method: 'GET',
+                    credentials: "same-origin",
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                return parseInt(result.state) || 0;
+            } catch (error) {
+                console.error('Error checking queue delay:', error);
+                return 0; // Default to no delay if there's an error
+            }
+        }
+
         function formatTime(seconds, duration) {
             // Check if elapsed time exceeds duration
             if (seconds > duration) {
@@ -1185,6 +1212,36 @@
 
         async function playSong(track, playButton) {
             try {
+                // Get current queue delay setting
+                const delaySeconds = await getQueueDelay();
+                const currentTime = Date.now();
+                
+                // Check if enough time has passed since last queue
+                if (delaySeconds > 0 && lastQueueTime > 0) {
+                    const timeSinceLastQueue = (currentTime - lastQueueTime) / 1000;
+                    const remainingDelay = delaySeconds - timeSinceLastQueue;
+                    
+                    if (remainingDelay > 0) {
+                        // Show countdown on button
+                        playButton.innerHTML = `<i class='fa-solid fa-clock'></i> Wait ${Math.ceil(remainingDelay)}s`;
+                        playButton.disabled = true;
+                        
+                        // Start countdown
+                        const countdownInterval = setInterval(() => {
+                            const newRemainingTime = delaySeconds - ((Date.now() - lastQueueTime) / 1000);
+                            if (newRemainingTime <= 0) {
+                                clearInterval(countdownInterval);
+                                playButton.innerHTML = "<i class='fa-solid fa-plus'></i> Add to Queue";
+                                playButton.disabled = false;
+                            } else {
+                                playButton.innerHTML = `<i class='fa-solid fa-clock'></i> Wait ${Math.ceil(newRemainingTime)}s`;
+                            }
+                        }, 1000);
+                        
+                        return; // Exit early, don't queue the song yet
+                    }
+                }
+
                 const queueMode = await checkQueueMode();
 
                 const playRequest = {
@@ -1207,6 +1264,9 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
+
+                // Update last queue time
+                lastQueueTime = currentTime;
 
                 // Success: turn green for 1s, then disabled gray
                 playButton.innerHTML = "<i class='fa-solid fa-check'></i> Queued";

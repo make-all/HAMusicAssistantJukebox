@@ -158,7 +158,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             replacements = {
                 "your_music_assistant_config_id": entry.data[CONF_MUSIC_ASSISTANT_ID],
                 "media_player.your_speaker": entry.data[CONF_MEDIA_PLAYER],
-                "<your HA IP here>": base_url
+                "<your HA IP here>": base_url,
+                "number.music_assistant_jukebox_jukebox_queue_delay": f"number.{DOMAIN}_{entry.entry_id}_jukebox_queue_delay"
             }
 
             for old, new in replacements.items():

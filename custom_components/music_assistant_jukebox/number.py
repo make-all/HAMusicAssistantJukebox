@@ -18,7 +18,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up number platform."""
-    async_add_entities([QueueLengthNumber(hass, entry)])
+    async_add_entities([
+        QueueLengthNumber(hass, entry),
+        QueueDelayNumber(hass, entry)                
+    ])
 
 class QueueLengthNumber(JukeboxBaseMixin, NumberEntity):
     """Number entity for queue length."""
@@ -30,6 +33,30 @@ class QueueLengthNumber(JukeboxBaseMixin, NumberEntity):
     _attr_icon = "mdi:playlist-music"
     _attr_native_min_value = 0
     _attr_native_max_value = 1000
+    _attr_native_step = 1
+    _attr_mode = NumberMode.BOX
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the number."""
+        self.hass = hass
+        self.entry = entry
+        self._attr_native_value = 0
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        self._attr_native_value = int(value)
+        self.async_write_ha_state()
+
+class QueueDelayNumber(JukeboxBaseMixin, NumberEntity):
+    """Number entity for queueing delay in seconds."""
+
+    _attr_has_entity_name = True
+    _attr_name = "JukeBox: Queuing Delay"
+    _attr_unique_id = "jukebox_queuing_delay"
+    _attr_native_unit_of_measurement = "seconds"
+    _attr_icon = "mdi:timer"
+    _attr_native_min_value = 0
+    _attr_native_max_value = 300  # 5 minutes max
     _attr_native_step = 1
     _attr_mode = NumberMode.BOX
 
