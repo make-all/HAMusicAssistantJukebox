@@ -8,6 +8,8 @@ from homeassistant.components.number import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers import state as state_helper
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN, LOGGER
 from .switch import JukeboxBaseMixin
@@ -47,7 +49,7 @@ class QueueLengthNumber(JukeboxBaseMixin, NumberEntity):
         self._attr_native_value = int(value)
         self.async_write_ha_state()
 
-class QueueDelayNumber(JukeboxBaseMixin, NumberEntity):
+class QueueDelayNumber(JukeboxBaseMixin, RestoreEntity, NumberEntity):
     """Number entity for queueing delay in seconds."""
 
     _attr_has_entity_name = True
@@ -65,6 +67,17 @@ class QueueDelayNumber(JukeboxBaseMixin, NumberEntity):
         self.hass = hass
         self.entry = entry
         self._attr_native_value = 0
+
+    async def async_added_to_hass(self):
+        """Restore last known value from state history."""
+        await super().async_added_to_hass()
+        last_state = await self.async_get_last_state()
+        if last_state and last_state.state not in (None, "unknown", "unavailable"):
+            try:
+                self._attr_native_value = int(float(last_state.state))
+                self.async_write_ha_state()
+            except Exception:
+                pass
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
