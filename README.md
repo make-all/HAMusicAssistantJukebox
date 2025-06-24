@@ -15,6 +15,8 @@ A Home Assistant integration that provides a web-based song request system that 
 - Access control through Home Assistant
 - Auto revoking/creating access tokens for security
 
+Head on over to [Discussions / FeatureRequests](https://github.com/DJS91/HAMusicAssistantJukebox/discussions) if you want to request new features and general discussion!
+
 ## Prerequisites
 
 Before installing this integration, make sure you have:
