@@ -20,7 +20,8 @@ Head on over to [Discussions / FeatureRequests](https://github.com/DJS91/HAMusic
 ## Prerequisites
 
 Before installing this integration, make sure you have:
-- Home Assistant instance with [Music Assistant](https://github.com/music-assistant/hass-music-assistant) integration (Seperately hosted HA/MA instances may not work)
+- Home Assistant instance with [Music Assistant](https://github.com/music-assistant/hass-music-assistant) integration
+- Music Assistant Server Addon in Home Assistant (Seperately hosted HA/MA instances may not work)
 - A supported music provider configured in Music Assistant (e.g. Spotify, Apple Music, etc.)
 - Media player entity configured in Home Assistant
 
