@@ -24,8 +24,50 @@
         let queueCheckInterval = null; // Interval for checking queue updates
         let lastQueueTime = window.localStorage.getItem("lastQueueTime") ?? 0;
         let queueDelaySeconds = 0;
+        let allTracks = []; // Store all 50 tracks
+        let currentFilter = sessionStorage.getItem('currentFilter') || 'all'; // Load from session storage
+
     </script>
    <style>
+
+        .source-filters {
+            display: none;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .source-filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 0px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 16px;
+            margin: 0 5px 5px 0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .source-filter-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .source-filter-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+        }
+
+        .source-filter-btn img {
+            height: 12px;
+            width: auto;
+        }
+
         input, select {
             color: #fff !important;
             -webkit-text-fill-color: #e5e5e5 !important;
@@ -387,6 +429,17 @@
                 padding: 0 10px;
             }
 
+            .source-filters {
+                text-align: left;
+                margin: 10px 0;
+            }
+            
+            .source-filter-btn {
+                font-size: 0.8em;
+                padding: 6px 12px;
+                margin: 0 3px 3px 0;
+            }
+
             .results-table {
                 display: table;
                 overflow-x: auto;
@@ -740,6 +793,7 @@
             </div>
             <button style="display: none;" id="searchButton">Search</button>
         </div>
+        <div id="sourceFilters" class="source-filters"></div>
         <div id="placeholderImage">
             <link href="https://fonts.googleapis.com/css?family=Raleway:200,100,400" rel="stylesheet" type="text/css" />
             <h1>
@@ -885,6 +939,10 @@
                         placeholder.style.display = 'block';
                     }
                     document.getElementById('songResults').innerHTML = '';
+                    document.getElementById('sourceFilters').style.display = 'none';
+                    allTracks = [];
+                    currentFilter = 'all';
+                    sessionStorage.setItem('currentFilter', 'all');
                 }
             });
 
@@ -892,12 +950,16 @@
                 searchInput.value = '';
                 updateSearchIcons(false);
                 searchInput.focus();
-                // Reset search results
+                // Reset search results and clear session filter
                 const placeholder = document.getElementById('placeholderImage');
                 if (placeholder) {
                     placeholder.style.display = 'block';
                 }
                 document.getElementById('songResults').innerHTML = '';
+                document.getElementById('sourceFilters').style.display = 'none';
+                allTracks = [];
+                currentFilter = 'all';
+                sessionStorage.setItem('currentFilter', 'all');
             });
 
             const searchInputContainer = document.querySelector('.search-input-container');
@@ -1051,7 +1113,6 @@
         }
 
         async function searchSongs() {
-
             // Hide placeholder image when search starts
             const placeholder = document.getElementById('placeholderImage');
             const searchTerm = document.getElementById('searchInput').value.trim();
@@ -1073,13 +1134,11 @@
 
             updateSearchIcons(true); // Show loader, hide clear
             try {
-
                 const searchRequest = {
-                    limit: "10",
+                    limit: "50",
                     library_only: "false",
                     config_entry_id: MUSIC_ASSISTANT_CONFIG,
                     name: searchTerm,
-                    //media_type: "track"
                 };
 
                 const response = await fetch(SEARCH_API_ENDPOINT, {
@@ -1100,20 +1159,125 @@
                 if (placeholder) {
                     placeholder.style.display = 'none';
                 }
+                
                 const data = await response.json();
                 const tracks = data.service_response.tracks;
-                displaySongs(tracks);
+                
+                // Store all tracks globally
+                allTracks = tracks || [];
+                // Don't reset currentFilter here - keep the saved session filter
+                
+                // Create source filter buttons
+                createSourceFilters(allTracks);
+                
+                // Display songs (createSourceFilters will handle applying the saved filter)
 
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while searching for songs');
             } finally {
-                updateSearchIcons(false); // Hide loader, show clear if input not empty
+                updateSearchIcons(false);
                 searchbtn.textContent = 'Search';
                 searchbtn.disabled = false;
                 searchbtn.style.backgroundColor = '#246fe0';
                 searchbtn.style.borderColor = '#373497';
+            }
+        }
 
+        function createSourceFilters(tracks) {
+            const filterContainer = document.getElementById('sourceFilters');
+            
+            if (!tracks || tracks.length === 0) {
+                filterContainer.style.display = 'none';
+                return;
+            }
+
+            // Get unique sources
+            const sources = new Set();
+            tracks.forEach(track => {
+                const sourceProvider = track.uri ? track.uri.split(':')[0] : 'unknown';
+                sources.add(sourceProvider);
+            });
+
+            // Clear existing filters
+            filterContainer.innerHTML = '';
+
+            // Create button for each unique source
+            sources.forEach(source => {
+                const tracksForSource = tracks.filter(track => {
+                    const trackSource = track.uri ? track.uri.split(':')[0] : 'unknown';
+                    return trackSource === source;
+                });
+                
+                const button = document.createElement('button');
+                button.className = 'source-filter-btn';
+                button.setAttribute('data-source', source);
+                
+                // Check if this source matches the saved filter
+                if (currentFilter === source) {
+                    button.classList.add('active');
+                }
+                
+                // Add logo or text based on source
+                const formattedSource = source.replace(/_/g, ' ');
+                if (source.toLowerCase() === 'spotify') {
+                    button.innerHTML = `<img src="https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Full_Logo_RGB_White.png" alt="Spotify" style="filter: brightness(1.5); height: 16px; width: auto;">`;
+                } else if (source.toLowerCase() === 'apple_music') {
+                    button.innerHTML = `<img src="https://www.apple.com/v/music/a/images/heros/music_logo.svg" alt="Apple Music" style="filter: brightness(0) invert(1); height: 16px; width: auto;">`;
+                } else if (source.toLowerCase() === 'library') {
+                    button.innerHTML = `<img src="https://www.music-assistant.io/assets/transparent-logo.png" alt="Music Assistant" style="filter: brightness(0) invert(1); height: 16px; width: auto;">`;
+                } else {
+                    const displayName = formattedSource.charAt(0).toUpperCase() + formattedSource.slice(1);
+                    button.textContent = displayName;
+                }
+                
+                button.onclick = () => toggleSourceFilter(source);
+                filterContainer.appendChild(button);
+            });
+
+            filterContainer.style.display = 'block';
+            
+            // Apply the saved filter if it's not 'all'
+            if (currentFilter !== 'all' && sources.has(currentFilter)) {
+                const filteredTracks = allTracks.filter(track => {
+                    const trackSource = track.uri ? track.uri.split(':')[0] : 'unknown';
+                    return trackSource === currentFilter;
+                });
+                displaySongs(filteredTracks);
+            } else {
+                // Reset to 'all' if saved filter doesn't exist in current results
+                currentFilter = 'all';
+                sessionStorage.setItem('currentFilter', 'all');
+                displaySongs(allTracks);
+            }
+        }
+
+        function toggleSourceFilter(selectedSource) {
+            const button = document.querySelector(`[data-source="${selectedSource}"]`);
+            
+            if (button.classList.contains('active')) {
+                // If button is active, deactivate it and show all sources
+                button.classList.remove('active');
+                currentFilter = 'all';
+                sessionStorage.setItem('currentFilter', 'all');
+                displaySongs(allTracks);
+            } else {
+                // Deactivate all other buttons
+                const buttons = document.querySelectorAll('.source-filter-btn');
+                buttons.forEach(btn => btn.classList.remove('active'));
+                
+                // Activate selected button
+                button.classList.add('active');
+                currentFilter = selectedSource;
+                sessionStorage.setItem('currentFilter', selectedSource);
+                
+                // Filter and display tracks
+                const filteredTracks = allTracks.filter(track => {
+                    const trackSource = track.uri ? track.uri.split(':')[0] : 'unknown';
+                    return trackSource === selectedSource;
+                });
+                
+                displaySongs(filteredTracks);
             }
         }
 
@@ -1143,7 +1307,7 @@
             }
 
             // Display each track in a row
-            tracks.forEach(track => {
+            tracks.slice(0, 10).forEach(track => {
                 const row = songResults.insertRow();
 
                 // Album cover cell
