@@ -432,9 +432,17 @@
             }
 
             .results-table td:nth-child(3) {
-                /* display: none; */
+                /* Source column - center it on mobile */
                 width: 100%;
-                padding-top: 10px;
+                padding: 5px 0;
+                text-align: center;
+            }
+
+            .results-table td:nth-child(4) {
+                /* Play button column - make sure it's centered */
+                width: 100%;
+                padding: 10px 0;
+                text-align: center;
             }
 
             .results-table td:first-child {
@@ -746,6 +754,7 @@
                 <tr>
                     <th>Album</th>
                     <th>Track</th>
+                    <th>Source</th>
                     <th></th>
                 </tr>
             </thead>
@@ -1172,6 +1181,29 @@
 
                 detailsCell.appendChild(trackDiv);
                 detailsCell.appendChild(artistDiv);
+
+                // Source provider cell (new column)
+                const sourceCell = row.insertCell();
+                const sourceDiv = document.createElement('div');
+                const sourceProvider = track.uri ? track.uri.split(':')[0] : 'unknown';
+                const formattedSource = sourceProvider.replace(/_/g, ' ');
+                
+                if (sourceProvider.toLowerCase() === 'spotify') {
+                    sourceDiv.innerHTML = '<img src="https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Full_Logo_RGB_White.png" alt="Spotify" style="height: 19px; width: auto; margin:17px; opacity: 80%;">';
+                } else if (sourceProvider.toLowerCase() === 'apple_music' || formattedSource.toLowerCase() === 'apple music') {
+                    sourceDiv.innerHTML = '<img src="https://www.apple.com/v/music/a/images/heros/music_logo.svg" alt="Apple Music" style="height: 17px; margin:17px; width: auto; filter: brightness(0.8);">';
+                } else if (sourceProvider.toLowerCase() === 'library') {
+                    sourceDiv.innerHTML = '<img src="https://www.music-assistant.io/assets/transparent-logo.png" alt="Music Assistant" style="height: 15px; width: auto; margin: 17px; filter: brightness(0.8)">';
+                } else {
+                    sourceDiv.textContent = formattedSource.charAt(0).toUpperCase() + formattedSource.slice(1);
+                    sourceDiv.style.color = '#888';
+                    sourceDiv.style.fontSize = '0.8em';
+                    sourceDiv.style.fontStyle = 'italic';
+                }
+
+                sourceDiv.style.textAlign = 'center';
+                sourceCell.appendChild(sourceDiv);
+
 
                 // Play button cell
                 const actionCell = row.insertCell();
