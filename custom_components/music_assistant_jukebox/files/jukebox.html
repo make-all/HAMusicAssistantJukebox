@@ -1353,11 +1353,11 @@
                 const formattedSource = sourceProvider.replace(/_/g, ' ');
                 
                 if (sourceProvider.toLowerCase() === 'spotify') {
-                    sourceDiv.innerHTML = '<img src="https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Full_Logo_RGB_White.png" alt="Spotify" style="height: 19px; width: auto; margin:17px; opacity: 80%;">';
+                    sourceDiv.innerHTML = '<img src="https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Full_Logo_RGB_White.png" alt="Spotify" style="height: 19px; width: auto; opacity: 80%;">';
                 } else if (sourceProvider.toLowerCase() === 'apple_music' || formattedSource.toLowerCase() === 'apple music') {
-                    sourceDiv.innerHTML = '<img src="https://www.apple.com/v/music/a/images/heros/music_logo.svg" alt="Apple Music" style="height: 17px; margin:17px; width: auto; filter: brightness(0.8);">';
+                    sourceDiv.innerHTML = '<img src="https://www.apple.com/v/music/a/images/heros/music_logo.svg" alt="Apple Music" style="height: 17px; width: auto; filter: brightness(0.8);">';
                 } else if (sourceProvider.toLowerCase() === 'library') {
-                    sourceDiv.innerHTML = '<img src="https://www.music-assistant.io/assets/transparent-logo.png" alt="Music Assistant" style="height: 15px; width: auto; margin: 17px; filter: brightness(0.8)">';
+                    sourceDiv.innerHTML = '<img src="https://www.music-assistant.io/assets/transparent-logo.png" alt="Music Assistant" style="height: 15px; width: auto; filter: brightness(0.8)">';
                 } else {
                     sourceDiv.textContent = formattedSource.charAt(0).toUpperCase() + formattedSource.slice(1);
                     sourceDiv.style.color = '#888';
