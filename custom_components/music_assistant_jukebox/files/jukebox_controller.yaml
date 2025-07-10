@@ -33,7 +33,10 @@ triggers:
     id: Queue Event
   - trigger: state
     entity_id: number.music_assistant_jukebox_jukebox_queue_length
+    from: "1"
     to: "0"
+    for:
+      seconds: 2
     id: Playlist finished
   - trigger: state
     entity_id: switch.music_assistant_jukebox_jukebox_allow_access

@@ -1382,7 +1382,6 @@
 
         async function checkQueueMode() {
             try {
-
                 const response = await fetch(CHECK_QUEUE_MODE_ENDPOINT, {
                     method: 'GET',
                     credentials: "same-origin",
@@ -1398,7 +1397,36 @@
                 }
 
                 const result = await response.json();
-                return result.state === 'on' ? 'add' : 'replace_next';
+                // if queuing, add the song to the end of the queue
+                if (result.state === 'on') {
+                    return 'add';
+                }
+                // check what type of media is playing to decide how to queue the song
+                const queueRequest = {
+                    entity_id: MEDIA_PLAYER
+                };
+
+                const queueResponse = await fetch(GETQUEUE_API_ENDPOINT, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(queueRequest)
+                });
+                if (queueResponse.ok) {
+                    const qdata = await queueResponse.json();
+                    const queueData = qdata.service_response[MEDIA_PLAYER];
+                    if (queueData && queueData.current_item && queueData.current_item.media_item
+                        && queueData.current_item.media_item.media_type === 'radio') {
+                        // radio streams are infinite length, so play immediately
+                        return 'replace';
+                    }
+                }
+                // default to letting the current track finish before playing selected song
+                return 'replace_next';
 
             } catch (error) {
                 console.error('Error checking queue mode:', error);
