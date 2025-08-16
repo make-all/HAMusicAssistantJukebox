@@ -941,8 +941,8 @@
                     document.getElementById('songResults').innerHTML = '';
                     document.getElementById('sourceFilters').style.display = 'none';
                     allTracks = [];
-                    currentFilter = 'all';
-                    sessionStorage.setItem('currentFilter', 'all');
+                    //currentFilter = 'all';
+                    //sessionStorage.setItem('currentFilter', 'all');
                 }
             });
 
@@ -958,8 +958,8 @@
                 document.getElementById('songResults').innerHTML = '';
                 document.getElementById('sourceFilters').style.display = 'none';
                 allTracks = [];
-                currentFilter = 'all';
-                sessionStorage.setItem('currentFilter', 'all');
+                //currentFilter = 'all';
+                //sessionStorage.setItem('currentFilter', 'all');
             });
 
             const searchInputContainer = document.querySelector('.search-input-container');
@@ -1237,17 +1237,19 @@
 
             filterContainer.style.display = 'block';
             
-            // Apply the saved filter if it's not 'all'
+            // Apply the saved filter if it exists in current results
             if (currentFilter !== 'all' && sources.has(currentFilter)) {
                 const filteredTracks = allTracks.filter(track => {
                     const trackSource = track.uri ? track.uri.split(':')[0] : 'unknown';
                     return trackSource === currentFilter;
                 });
                 displaySongs(filteredTracks);
+            } else if (currentFilter !== 'all') {
+                // If saved filter doesn't exist in current results, show no results message
+                // but keep the filter preference saved
+                displaySongs([]); // This will show "No songs found"
             } else {
-                // Reset to 'all' if saved filter doesn't exist in current results
-                currentFilter = 'all';
-                sessionStorage.setItem('currentFilter', 'all');
+                // Only show all tracks if filter is actually 'all'
                 displaySongs(allTracks);
             }
         }
